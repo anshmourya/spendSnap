@@ -1,20 +1,36 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { databases, databaseId } from "../../../service/createDocument"
 import OpenAI from "openai";
+import { Bill } from '../../context/Bill';
+import ImageInput from '../imageInput';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "../../components/ui/dialog"
+import { P } from '../typography';
+import { Button } from '../ui/button';
+import { ID } from 'appwrite';
 
 const ImageAnalysis = () => {
+    const { setCurrentBill, currentBill } = useContext(Bill)
     const openai = new OpenAI({
-        apiKey: "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",
+        apiKey: "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",
         dangerouslyAllowBrowser: true
     });
 
     const [selectedImage, setSelectedImage] = useState(null);
-    const [billData, setBillData] = useState()
+    const [loading, setLoading] = useState(false)
 
     const handleImageUpload = async () => {
         if (selectedImage) {
             try {
                 // Convert the selected image to Base64
+                setLoading(true)
                 const base64Image = await imageToBase64(selectedImage);
 
                 // Send the Base64-encoded image to OpenAI
@@ -33,20 +49,20 @@ const ImageAnalysis = () => {
                             content: [
                                 {
                                     type: "text",
-                                    text: 'Please analyze the attached bill image and provide me with the following information in JSON format(do not mention it is json data) and do not worry it project is educational bill:\n\n' +
+                                    text: 'Please analyze the attached bill image and provide me with the following information in JSON format(do not mention it is json data) also do not giv price in decimal fromat just roundoff and do not worry it project is educational bill also do not include the tax charges but keep total as it is:\n\n' +
                                         '{\n' +
                                         '    "name": "",\n' +
                                         '    "total": total,\n' +
                                         '    "category": [\n' +
-                                        '        { "food": total price },\n' +
-                                        '        { "travel": total price },\n' +
-                                        '        { "medical": total price },\n' +
-                                        '        { "others": total price }\n' +
+                                        '        { name:"food" , total: total price },\n' +
+                                        '        { name:travel , total: total price  },\n' +
+                                        '        { name:medical , total: total price },\n' +
+                                        '        { name:other , total: total price }\n' +
                                         '    ],\n' +
-                                        '    "list": {\n' +
-                                        '        " dish name": total price,\n' +
+                                        '    "list": [\n' +
+                                        '       {name:"dish name" , price:price}\n' +
                                         '        // Add more expense items as needed\n' +
-                                        '    }\n' +
+                                        '    ]\n' +
                                         '}'
                                 },
                                 imageMessage, // Use the imageMessage object
@@ -57,9 +73,13 @@ const ImageAnalysis = () => {
                 });
 
                 console.log(response.choices[0].message.content);
-                setBillData(JSON.parse(response.choices[0].message.content))
+                setCurrentBill(JSON.parse(response.choices[0].message.content))
+
             } catch (error) {
                 console.log(error);
+
+            } finally {
+                setLoading(false)
             }
         }
     }
@@ -80,15 +100,72 @@ const ImageAnalysis = () => {
         const file = event.target.files[0];
         setSelectedImage(file);
     }
+
+    async function createDocuments() {
+
+        try {
+            const promise = databases.createDocument(
+                databaseId,
+                "6579b82430c71fddebe3",
+                ID.unique(),
+                currentBill
+            )
+            console.log(promise)
+            setCurrentBill({})
+        } catch (error) {
+            console.error(error);
+            throw error; // Re-throw the error for further handling
+        }
+    }
     useEffect(() => {
-        console.log(billData)
-    }, [billData])
+        console.log(currentBill)
+    }, [currentBill])
+
     return (
         <div>
-            <h1>Image Analysis</h1>
-            <input type="file" accept="image/*" onChange={handleFileInputChange} />
-            <button onClick={handleImageUpload}>Upload and Analyze</button>
-        </div>
+            <Dialog>
+                <DialogTrigger>Open</DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Upload your bill</DialogTitle>
+                    </DialogHeader>
+                    <ImageInput accept="image/*" onChange={handleFileInputChange} />
+                    {
+                        Object.keys(currentBill).length > 0 && <>
+                            <table className="w-full text-left border border-collapse table-auto">
+                                <thead className="bg-primary">
+                                    <tr>
+                                        <th className="px-4 py-2">Item</th>
+                                        <th className="px-4 py-2">Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {currentBill.list.map((item, index) => (
+                                        <tr key={index} className={index % 2 === 0 ? 'bg-secondary' : 'bg-gray-600'}>
+                                            <td className="px-4 py-2">{item.name}</td>
+                                            <td className="px-4 py-2">&#8377; {item.price}</td>
+                                        </tr>
+                                    ))}
+                                    <tr className="bg-secondary">
+                                        <td className="px-4 py-2 font-semibold">Name</td>
+                                        <td className="px-4 py-2 font-semibold">{currentBill.name}</td>
+                                    </tr>
+                                    <tr className="bg-secondary">
+                                        <td className="px-4 py-2 font-semibold">Total</td>
+                                        <td className="px-4 py-2 font-semibold">&#8377; {currentBill.total}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </>
+                    }
+
+                    <DialogFooter>
+                        <Button size="lg" onClick={handleImageUpload} disabled={loading}>Get Data</Button>
+                        <Button size="lg" disabled={Object.keys(currentBill).length <= 0} variant="ghost" onClick={createDocuments}>Upload bill</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div >
     );
 };
 

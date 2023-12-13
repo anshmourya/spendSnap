@@ -1,7 +1,7 @@
 .custum-file-upload {
     height: 100%;
     width: 100%;
-    max-width: 200px;
+    max-width: 500px;
     max-height: 200px;
     display: flex;
     flex-direction: column;
@@ -14,6 +14,7 @@
     background-color: #212121;
     padding: 1.5rem;
     border-radius: 10px;
+    margin: auto;
 }
 
 .custum-file-upload .icon {

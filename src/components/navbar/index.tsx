@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { GiSplitCross } from "react-icons/gi";
 import { Button } from "../ui/button";
+import ImageAnalysis from "../categorizeData";
 
 const NavBar = () => {
   const [openNav, setOpenNav] = useState<boolean>(false);
@@ -64,7 +65,7 @@ const NavBar = () => {
                 {/* </Link> */}
               </li>
             ))}
-            {/* <li><CategorizeData /></li> */}
+            <li><ImageAnalysis /></li>
           </ul>
         </div>
       </div>
@@ -83,7 +84,7 @@ const NavBar = () => {
               {/* </Link> */}
             </li>
           ))}
-          {/* <li><CategorizeData /></li> */}
+          <li><ImageAnalysis /></li>
         </ul>
       </div>
     </header>
