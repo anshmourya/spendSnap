@@ -12,14 +12,16 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "../../components/ui/dialog"
-import { P } from '../typography';
+import { H1, P } from '../typography';
 import { Button } from '../ui/button';
 import { ID } from 'appwrite';
+import Loader from '../loader';
+import { notify } from '../../helper/notification';
 
 const ImageAnalysis = () => {
     const { setCurrentBill, currentBill } = useContext(Bill)
     const openai = new OpenAI({
-        apiKey: "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",
+        apiKey: import.meta.env.VITE_OPENAI_KEY,
         dangerouslyAllowBrowser: true
     });
 
@@ -110,7 +112,7 @@ const ImageAnalysis = () => {
                 ID.unique(),
                 currentBill
             )
-            console.log(promise)
+            notify("bill has been uploaded", "success")
             setCurrentBill({})
         } catch (error) {
             console.error(error);
@@ -124,14 +126,18 @@ const ImageAnalysis = () => {
     return (
         <div>
             <Dialog>
-                <DialogTrigger>Open</DialogTrigger>
+                <DialogTrigger>
+                    <Button>upload bill</Button>
+                </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Upload your bill</DialogTitle>
                     </DialogHeader>
                     <ImageInput accept="image/*" onChange={handleFileInputChange} />
-                    {
-                        Object.keys(currentBill).length > 0 && <>
+                    {loading ? (
+                        <Loader />
+                    ) : (
+                        Object.keys(currentBill).length > 0 && (
                             <table className="w-full text-left border border-collapse table-auto">
                                 <thead className="bg-primary">
                                     <tr>
@@ -156,8 +162,8 @@ const ImageAnalysis = () => {
                                     </tr>
                                 </tbody>
                             </table>
-                        </>
-                    }
+                        )
+                    )}
 
                     <DialogFooter>
                         <Button size="lg" onClick={handleImageUpload} disabled={loading}>Get Data</Button>

@@ -4,16 +4,17 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import { GiSplitCross } from "react-icons/gi";
 import { Button } from "../ui/button";
 import ImageAnalysis from "../categorizeData";
+import Goals from "../goal/indesx";
 
 const NavBar = () => {
   const [openNav, setOpenNav] = useState<boolean>(false);
   const menuItems = useMemo(
     () => [
-      { id: 1, text: "Home", href: "home" },
-      { id: 3, text: "Know us", href: "whoWeAre" },
-      { id: 4, text: "Service", href: "service" },
-      { id: 5, text: "Contact Us", href: "contactUs" },
-      { id: 6, text: "About Us", href: "aboutUs" },
+      // { id: 1, text: "Home", href: "home" },
+      // { id: 3, text: "Know us", href: "whoWeAre" },
+      // { id: 4, text: "Service", href: "service" },
+      // { id: 5, text: "Contact Us", href: "contactUs" },
+      // { id: 6, text: "About Us", href: "aboutUs" },
     ],
     []
   );
@@ -21,14 +22,6 @@ const NavBar = () => {
   return (
     <header className="flex items-center justify-between w-full p-2 bg-transparent border-b">
       <div className="logo">
-        {/* <image
-          src="/midmotionLogo.png"
-          alt="logo"
-          width={100}
-          height={100}
-          priority
-          className="w-auto h-auto -top-20 max-w-[70px]"
-        /> */}
         <h1 className="text-[35px]">
           spend<span className="text-green-400">Snap</span>
         </h1>
@@ -54,18 +47,11 @@ const NavBar = () => {
             </Button>
             {menuItems.map((item) => (
               <li key={item.id}>
-                {/* <Link
-                  to={item.href}
-                  className="font-semibold text-black cursor-pointer "
-                  activeClass="active"
-                  smooth
-                  spy
-                > */}
                 {item.text}
-                {/* </Link> */}
               </li>
             ))}
             <li><ImageAnalysis /></li>
+            <li><Goals /></li>
           </ul>
         </div>
       </div>
@@ -73,18 +59,11 @@ const NavBar = () => {
         <ul className="items-center justify-around hidden gap-5 md:flex">
           {menuItems.map((item) => (
             <li key={item.id}>
-              {/* <Link
-                to={item.href}
-                activeClass="active"
-                smooth
-                spy
-                className="text-white cursor-pointer"
-              > */}
               {item.text}
-              {/* </Link> */}
             </li>
           ))}
           <li><ImageAnalysis /></li>
+          <li><Goals /></li>
         </ul>
       </div>
     </header>

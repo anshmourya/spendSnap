@@ -7,6 +7,8 @@ import Home from './pages/home'
 import Dashboard from './pages/dashboard'
 import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 Chart.register(CategoryScale);
 const App = () => {
   return (
@@ -17,6 +19,7 @@ const App = () => {
         {/* <Route path='/login' element={ <Logi/>} /> */}
         {/* <Route path='/' element={ <Home/>} /> */}
       </Routes>
+      <ToastContainer />
     </>
 
   )
